@@ -43,7 +43,7 @@ for house_number in range(1, total_houses + 1):
     }
 for house, details in bills.items():
     print(f"{house}: Units Used = {details['Units Used']}, Bill Amount = ${details['Bill Amount']}")'''
-#A retail store wants to automate its billing process using a python program.As a programmer,you are asked to develop a console-based application that assists the cashier in generating customer bills.the program should accept the customers name,the number of items purchased,and the price of each item.ift should calculate the total bill amount and apply a discount based on the total purchase value(for example,higher discounts for higher bill amounts).the program must also calculate tax on the discounted amount and display the final payable bill clearly.the system should allow the cashier top generate bills for multiple customers until they choose to stop the program.
+'''#A retail store wants to automate its billing process using a python program.As a programmer,you are asked to develop a console-based application that assists the cashier in generating customer bills.the program should accept the customers name,the number of items purchased,and the price of each item.ift should calculate the total bill amount and apply a discount based on the total purchase value(for example,higher discounts for higher bill amounts).the program must also calculate tax on the discounted amount and display the final payable bill clearly.the system should allow the cashier top generate bills for multiple customers until they choose to stop the program.
 def calculate_discount(total_amount):
     if total_amount > 500:
         return total_amount * 0.10  # 10% discount
@@ -74,4 +74,72 @@ while True:
     print(f"Final Payable Amount: ${final_amount:.2f}")
     another = input("\nDo you want to generate a bill for another customer? (yes/no): ")
     if another.lower() != 'yes':
+        break'''
+'''#a city traffic department wants to build a python based syatem to monitor vechile speed and automatically identify traffic rules vilolations .you are required to develop a console based program that accepts a vehicle number ,the type of vehicle (two-wheeler,car,or heavy vehicle), and the recorded speed based on predefined speed limits for each vehicle limits for each vehicle type the progarm should determine wheather the vehicle is within the permitted speed or has violated the speed or has violated speed limit. if violated occurs the program should calculate the fine amount according to the level of overspeending and display a detailed violation report the syatem should continue procesing vehicle records until the operater choosesto termenate program.
+def get_speed_limit(vehicle_type):
+    speed_limits = {
+        'two-wheeler': 40,
+        'car': 60,
+        'heavy vehicle': 50
+    }
+    return speed_limits.get(vehicle_type.lower(), 0)
+def calculate_fine(overspeed):
+    if overspeed <= 10:
+        return 100
+    elif overspeed <= 20:
+        return 200
+    else:
+        return 500
+while True:
+    vehicle_number = input("Enter vehicle number: ")
+    vehicle_type = input("Enter vehicle type (two-wheeler/car/heavy vehicle): ")
+    recorded_speed = int(input("Enter recorded speed (km/h): "))
+    speed_limit = get_speed_limit(vehicle_type)
+    if speed_limit == 0:
+        print("Invalid vehicle type. Please try again.")
+        continue
+    if recorded_speed <= speed_limit:
+        print(f"Vehicle {vehicle_number} is within the speed limit of {speed_limit} km/h.")
+    else:
+        overspeed = recorded_speed - speed_limit
+        fine = calculate_fine(overspeed)
+        print(f"Vehicle {vehicle_number} has violated the speed limit by {overspeed} km/h.")
+        print(f"Fine amount: ${fine}")
+    another = input("Do you want to process another vehicle record? (yes/no): ")
+    if another.lower() != 'yes':
         break
+    '''
+'''#A hospital wants to implement a python based patient appointment system to reduce waiting times and improve patient experience.you are required to develop a console based application that allows patients to book appointments with doctors.the program should accept patient details such as name,age,and contact information.it should also allow patients to select a doctor from a predefined list and choose an available time slot.the program must check for scheduling conflicts and ensure that no double bookings occur.once an appointment is successfully booked the system should generate a confirmation message with all relevant details.the program should continue to accept new appointment requests until the operator chooses to terminate the program.
+doctors = {
+    'Dr. Smith': ['10:00 AM', '11:00 AM', '02:00 PM'],
+    'Dr. Johnson': ['09:00 AM', '01:00 PM', '03:00 PM'],
+    'Dr. Lee': ['10:30 AM', '12:00 PM', '04:00 PM']
+}
+appointments = {}
+while True:
+    patient_name = input("Enter patient name: ")
+    patient_age = input("Enter patient age: ")
+    patient_contact = input("Enter patient contact information: ")
+    print("\nAvailable Doctors:")
+    for i, doctor in enumerate(doctors.keys(), start=1):
+        print(f"{i}. {doctor}")
+    doctor_choice = int(input("Select a doctor by number: ")) - 1
+    selected_doctor = list(doctors.keys())[doctor_choice]
+    print(f"\nAvailable Time Slots for {selected_doctor}:")
+    available_slots = [slot for slot in doctors[selected_doctor] if (selected_doctor, slot) not in appointments]
+    for i, slot in enumerate(available_slots, start=1):
+        print(f"{i}. {slot}")
+    slot_choice = int(input("Select a time slot by number: ")) - 1
+    selected_slot = available_slots[slot_choice]
+    appointments[(selected_doctor, selected_slot)] = {
+        'Patient Name': patient_name,
+        'Age': patient_age,
+        'Contact': patient_contact
+    }
+    print("\n--- Appointment Confirmation ---")
+    print(f"Patient Name: {patient_name}")
+    print(f"Doctor: {selected_doctor}")
+    print(f"Time Slot: {selected_slot}")
+    another = input("\nDo you want to book another appointment? (yes/no): ")
+    if another.lower() != 'yes':
+        break'''
