@@ -143,3 +143,38 @@ while True:
     another = input("\nDo you want to book another appointment? (yes/no): ")
     if another.lower() != 'yes':
         break'''
+'''#A bank wants to introduce a python-based loan eligibility evaluation system to handle a wide range od real-world customer profiles and reduce manual processing time.you are required to develop a console-based application that accepts customer details such as name,age,income,credit score,and existing debts.the program should evaluate the loan eligibility based on predefined criteria such as minimum income,credit score thresholds,and debt-to-income ratios.if the customer is eligible,the program should calculate the maximum loan amount they can avail based on their financial profile.the system should generate a detailed eligibility report for each customer and continue processing new applications until the operator chooses to terminate the program.
+def calculate_debt_to_income_ratio(debts, income):
+    if income == 0:
+        return float('inf')
+    return debts / income
+def evaluate_loan_eligibility(age, income, credit_score, debts):
+    min_income = 30000
+    min_credit_score = 600
+    max_debt_to_income_ratio = 0.4
+    if age < 18 or age > 65:
+        return False, 0
+    if income < min_income or credit_score < min_credit_score:
+        return False, 0
+    dti_ratio = calculate_debt_to_income_ratio(debts, income)
+    if dti_ratio > max_debt_to_income_ratio:
+        return False, 0
+    max_loan_amount = income * 5 - debts
+    return True, max_loan_amount
+while True:
+    customer_name = input("Enter customer name: ")
+    customer_age = int(input("Enter customer age: "))
+    customer_income = float(input("Enter customer income: "))
+    customer_credit_score = int(input("Enter customer credit score: "))
+    customer_debts = float(input("Enter existing debts: "))
+    eligible, max_loan = evaluate_loan_eligibility(customer_age, customer_income, customer_credit_score, customer_debts)
+    print("\n--- Loan Eligibility Report ---")
+    print(f"Customer Name: {customer_name}")
+    if eligible:
+        print("Status: Eligible for Loan")
+        print(f"Maximum Loan Amount: ${max_loan:.2f}")
+    else:
+        print("Status: Not Eligible for Loan")
+    another = input("\nDo you want to process another application? (yes/no): ")
+    if another.lower() != 'yes':
+        break'''
