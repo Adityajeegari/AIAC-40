@@ -178,3 +178,38 @@ while True:
     another = input("\nDo you want to process another application? (yes/no): ")
     if another.lower() != 'yes':
         break'''
+'''
+# A supermarket wants to automate its monthly sales analysis system using a python program to help the manager understand product-wise and day-wise sales performance.you are required to develop a console-based application that uses multiple loops to process sales data.the program should first ask for the number of days in month and then,for each day,ask for the number of products sold that day.for each product,the program should accept the product name,quantity sold,and price per unit.the program must calculate the total sales for each product and the overall sales for each day.at the end of the month,the system should generate a comprehensive sales report showing total sales per product,total sales per day,and the grand total sales for the month.the program should continue to accept new month's data until the operator chooses to terminate the program.
+while True:
+    num_days = int(input("Enter number of days in the month: "))
+    monthly_product_sales = {}
+    daily_sales_totals = []
+    for day in range(1, num_days + 1):
+        print(f"\nDay {day}:")
+        num_products = int(input("Enter number of products sold today: "))
+        daily_total = 0
+        for _ in range(num_products):
+            product_name = input("Enter product name: ")
+            quantity_sold = int(input("Enter quantity sold: "))
+            price_per_unit = float(input("Enter price per unit: "))
+            total_sales = quantity_sold * price_per_unit
+            daily_total += total_sales
+            if product_name in monthly_product_sales:
+                monthly_product_sales[product_name] += total_sales
+            else:
+                monthly_product_sales[product_name] = total_sales
+        daily_sales_totals.append(daily_total)
+        print(f"Total sales for Day {day}: ${daily_total:.2f}")
+    grand_total = sum(daily_sales_totals)
+    print("\n--- Monthly Sales Report ---")
+    print("Total Sales per Product:")
+    for product, total in monthly_product_sales.items():
+        print(f"{product}: ${total:.2f}")
+    print("\nTotal Sales per Day:")
+    for day, total in enumerate(daily_sales_totals, start=1):
+        print(f"Day {day}: ${total:.2f}")
+    print(f"\nGrand Total Sales for the Month: ${grand_total:.2f}")
+    another_month = input("\nDo you want to enter data for another month? (yes/no): ")
+    if another_month.lower() != 'yes':
+        break
+'''
