@@ -213,3 +213,63 @@ while True:
     if another_month.lower() != 'yes':
         break
 '''
+'''#A apartment complex wants to automate its Resident Maintenance Billing and Service Management System using Python to avoid manual bookkeeping errors and to track monthly maintenance payments efficiently. You are required to design an object-oriented Python application that models real-world entities using classes and constructors. The system should contain a class named Resident where the constructor initializes resident details such as flat number, resident name, apartment type (1BHK, 2BHK, or 3BHK), number of family members, parking slots, water usage units, electricity usage units, and whether additional facilities such as gym and swimming pool are subscribed. Another class named MaintenanceCalculator should compute monthly maintenance charges based on apartment type base maintenance cost, per-unit water charge, electricity charge slabs, parking charges, and facility subscription fees. A third class named ApartmentManagement should maintain multiple resident records generate bills, store payment status, and produce monthly reports. The program must calculate the total bill using multiple conditions such as higher water usage leading to higher rates, electricity slab-wise billing, and discounts for senior citizens or early payments. The system should also allow marking a bill as paid or unpaid and generate a warning list for pending payments. At the end of the execution, the program should display individual bills and a summary report showing total revenue collected, number of unpaid residents ,and highest bill amount.
+class Resident:
+    def __init__(self, flat_number, resident_name, apartment_type, family_members, parking_slots, water_units, electricity_units, gym_subscribed, pool_subscribed):
+        self.flat_number = flat_number
+        self.resident_name = resident_name
+        self.apartment_type = apartment_type
+        self.family_members = family_members
+        self.parking_slots = parking_slots
+        self.water_units = water_units
+        self.electricity_units = electricity_units
+        self.gym_subscribed = gym_subscribed
+        self.pool_subscribed = pool_subscribed
+class MaintenanceCalculator:
+    def __init__(self):
+        self.base_costs = {'1BHK': 1000, '2BHK': 1500, '3BHK': 2000}
+        self.water_charge_per_unit = 5
+        self.electricity_slabs = [(100, 2), (200, 3), (float('inf'), 5)]
+        self.parking_charge_per_slot = 200
+        self.gym_fee = 300
+        self.pool_fee = 500
+    def calculate_bill(self, resident):
+        base_cost = self.base_costs.get(resident.apartment_type, 0)
+        water_charge = resident.water_units * self.water_charge_per_unit
+        electricity_charge = sum(min(resident.electricity_units, slab[0]) * slab[1] for slab in self.electricity_slabs)
+        parking_charge = resident.parking_slots * self.parking_charge_per_slot
+        gym_fee = self.gym_fee if resident.gym_subscribed else 0
+        pool_fee = self.pool_fee if resident.pool_subscribed else 0
+        total_bill = base_cost + water_charge + electricity_charge + parking_charge + gym_fee + pool_fee
+        return total_bill
+class ApartmentManagement:
+    def __init__(self):
+        self.residents = []
+        self.payments = {}
+    def add_resident(self, resident):
+        self.residents.append(resident)
+    def generate_bills(self):
+        calculator = MaintenanceCalculator()
+        for resident in self.residents:
+            bill_amount = calculator.calculate_bill(resident)
+            self.payments[resident.flat_number] = {'Resident Name': resident.resident_name, 'Bill Amount': bill_amount, 'Paid': False}
+    def mark_payment(self, flat_number):
+        if flat_number in self.payments:
+            self.payments[flat_number]['Paid'] = True
+    def generate_report(self):
+        total_revenue = sum(payment['Bill Amount'] for payment in self.payments.values() if payment['Paid'])
+        unpaid_residents = [payment['Resident Name'] for payment in self.payments.values() if not payment['Paid']]
+        highest_bill = max(payment['Bill Amount'] for payment in self.payments.values())
+        print("\n--- Monthly Maintenance Report ---")
+        print(f"Total Revenue Collected: ${total_revenue:.2f}")
+        print(f"Number of Unpaid Residents: {len(unpaid_residents)}")
+        print(f"Highest Bill Amount: ${highest_bill:.2f}")
+# Example usage
+management = ApartmentManagement()
+resident1 = Resident(101, "Alice", "2BHK", 4, 1, 50, 150, True, False)
+resident2 = Resident(102, "Bob", "3BHK", 5, 2, 80, 250, False, True)
+management.add_resident(resident1)
+management.add_resident(resident2)
+management.generate_bills()
+management.mark_payment(101)  # Mark Alice's bill as paid
+management.generate_report()'''
