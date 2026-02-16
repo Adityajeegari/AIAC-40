@@ -273,3 +273,73 @@ management.add_resident(resident2)
 management.generate_bills()
 management.mark_payment(101)  # Mark Alice's bill as paid
 management.generate_report()'''
+'''#An online shopping company wants to build an Order Tracking and Sales Analysis System to maintain customer purchase records and analyze product sales. You are required to develop a Python program using classes, constructors, loops, conditional statements, and file handling. Each order should store order ID, customer name, product name, quantity, price per item, and order date. Whenever a new order is placed, the details must be saved permanently in a file. The program should allow the operator to repeatedly perform operations such as adding a new order, viewing all orders, searching an order by order ID, and updating the quantity or price. The system must automatically calculate the total amount for each order and generate a sales analysis report showing the total revenue, most sold product, and the highest value order. The program should continue running until the user chooses to exit.
+import json
+class Order:
+    def __init__(self, order_id, customer_name, product_name, quantity, price_per_item, order_date):
+        self.order_id = order_id
+        self.customer_name = customer_name
+        self.product_name = product_name
+        self.quantity = quantity
+        self.price_per_item = price_per_item
+        self.order_date = order_date
+    def total_amount(self):
+        return self.quantity * self.price_per_item
+class OrderTrackingSystem:
+    def __init__(self, filename='orders.json'):
+        self.filename = filename
+        self.orders = self.load_orders()
+    def load_orders(self):
+        try:
+            with open(self.filename, 'r') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            return []
+    def save_orders(self):
+        with open(self.filename, 'w') as file:
+            json.dump(self.orders, file, indent=4)
+    def add_order(self, order):
+        self.orders.append(order.__dict__)
+        self.save_orders()
+    def view_orders(self):
+        for order in self.orders:
+            print(order)
+    def search_order(self, order_id):
+        for order in self.orders:
+            if order['order_id'] == order_id:
+                return order
+        return None
+    def update_order(self, order_id, quantity=None, price_per_item=None):
+        for order in self.orders:
+            if order['order_id'] == order_id:
+                if quantity is not None:
+                    order['quantity'] = quantity
+                if price_per_item is not None:
+                    order['price_per_item'] = price_per_item
+                self.save_orders()
+                return True
+        return False
+    def sales_analysis_report(self):
+        total_revenue = sum(order['quantity'] * order['price_per_item'] for order in self.orders)
+        product_sales = {}
+        highest_value_order = 0
+        for order in self.orders:
+            product_sales[order['product_name']] = product_sales.get(order['product_name'], 0) + order['quantity']
+            highest_value_order = max(highest_value_order, order['quantity'] * order['price_per_item'])
+        most_sold_product = max(product_sales, key=product_sales.get)
+        print("\n--- Sales Analysis Report ---")
+        print(f"Total Revenue: ${total_revenue:.2f}")
+        print(f"Most Sold Product: {most_sold_product}")
+        print(f"Highest Value Order: ${highest_value_order:.2f}")
+# Example usage
+system = OrderTrackingSystem()
+order1 = Order(1, "Alice", "Laptop", 2, 1200.00, "2024-06-01")
+order2 = Order(2, "Bob", "Smartphone", 5, 800.00, "2024-06-02")
+system.add_order(order1)
+system.add_order(order2)
+system.view_orders()
+search_result = system.search_order(1)
+print("\nSearch Result:", search_result)
+system.update_order(1, quantity=3)
+system.view_orders()
+system.sales_analysis_report()'''
