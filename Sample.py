@@ -343,3 +343,246 @@ print("\nSearch Result:", search_result)
 system.update_order(1, quantity=3)
 system.view_orders()
 system.sales_analysis_report()'''
+'''#A national disaster management authority wants to develop a Smart Disaster Relief Resource Management System to efficiently manage relief camps, victims, and resource distribution during natural disasters such as floods or earthquakes. You are required to design and implement a Python application using object-oriented programming (classes and constructors), loops, conditional statements, file handling, and basic data analysis.The system should manage multiple relief camps. Each camp has a camp ID, location, maximum capacity, available food packets, medical kits, and volunteers. When a disaster victim arrives, the system should register the victim by storing details such as victim ID, name, age, health condition (normal/critical), and assigned camp. The system must automatically check camp capacity before assigning a victim. If the camp is full, it should display an appropriate message.The program should also allow distribution of food and medical kits to victims. If a victim is marked as “critical,” the system should prioritize medical kit allocation. Resource quantities must be updated automatically after distribution.
+#All camp details and victim records must be stored permanently in files. The administrator should be able to perform operations repeatedly such as adding a new camp, registering victims, distributing resources, viewing records, searching for a victim by ID, and generating reports.The final analytical report should display:
+#Total number of camps
+#Total victims registered
+#Camp with highest occupancy
+#Total food packets distributed
+#Total medical kits distributed
+#Number of critical victims
+import json
+class Camp:
+    def __init__(self, camp_id, location, max_capacity, food_packets, medical_kits, volunteers):
+        self.camp_id = camp_id
+        self.location = location
+        self.max_capacity = max_capacity
+        self.food_packets = food_packets
+        self.medical_kits = medical_kits
+        self.volunteers = volunteers
+        self.victims = []
+    def is_full(self):
+        return len(self.victims) >= self.max_capacity
+    def add_victim(self, victim):
+        if not self.is_full():
+            self.victims.append(victim)
+            return True
+        return False
+class Victim:
+    def __init__(self, victim_id, name, age, health_condition, assigned_camp):
+        self.victim_id = victim_id
+        self.name = name
+        self.age = age
+        self.health_condition = health_condition
+        self.assigned_camp = assigned_camp
+class DisasterReliefSystem:
+    def __init__(self, camps_file='camps.json', victims_file='victims.json'):
+        self.camps_file = camps_file
+        self.victims_file = victims_file
+        self.camps = self.load_camps()
+        self.victims = self.load_victims()
+    def load_camps(self):
+        try:
+            with open(self.camps_file, 'r') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            return []
+    def load_victims(self):
+        try:
+            with open(self.victims_file, 'r') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            return []
+    def save_camps(self):
+        with open(self.camps_file, 'w') as file:
+            json.dump(self.camps, file, indent=4)
+    def save_victims(self):
+        with open(self.victims_file, 'w') as file:
+            json.dump(self.victims, file, indent=4)
+    def add_camp(self, camp):
+        self.camps.append(camp.__dict__)
+        self.save_camps()
+    def register_victim(self, victim, camp_id):
+        for camp in self.camps:
+            if camp['camp_id'] == camp_id:
+                if len(camp['victims']) < camp['max_capacity']:
+                    victim_data = victim.__dict__
+                    camp['victims'].append(victim_data)
+                    self.victims.append(victim_data)
+                    self.save_camps()
+                    self.save_victims()
+                    print(f"Victim {victim.name} registered successfully to camp {camp_id}.")
+                    return True
+                else:
+                    print("Camp is full. Cannot register victim.")
+                    return False
+        print("Camp not found.")
+        return False
+    def distribute_resources(self, victim_id):
+        for victim in self.victims:
+            if victim['victim_id'] == victim_id:
+                assigned_camp_id = victim['assigned_camp']
+                for camp in self.camps:
+                    if camp['camp_id'] == assigned_camp_id:
+                        if victim['health_condition'] == 'critical':
+                            # Prioritize medical kit allocation
+                            if camp['medical_kits'] > 0:
+                                camp['medical_kits'] -= 1
+                                self.save_camps()
+                                print(f"Medical kit allocated to critical victim {victim['name']}.")
+                                return True
+                            else:
+                                print("No medical kits available.")
+                                return False
+                        else:
+                            # Allocate food packet
+                            if camp['food_packets'] > 0:
+                                camp['food_packets'] -= 1
+                                self.save_camps()
+                                print(f"Food packet allocated to victim {victim['name']}.")
+                                return True
+                            else:
+                                print("No food packets available.")
+                                return False
+        print("Victim not found.")
+        return False
+    def generate_report(self):
+        total_camps = len(self.camps)
+        total_victims = len(self.victims)
+        
+        if total_camps == 0:
+            print("\nNo camps available.")
+            return
+        
+        camp_occupancy = {camp['camp_id']: len(camp['victims']) for camp in self.camps}
+        highest_occupancy_camp = max(camp_occupancy, key=camp_occupancy.get) if camp_occupancy else None
+        
+        # Calculate initial resources minus current resources to get distributed amount
+        total_food_distributed = 0
+        total_medical_distributed = 0
+        
+        critical_victims = sum(1 for victim in self.victims if victim['health_condition'] == 'critical')
+        
+        print("\n--- Disaster Relief Report ---")
+        print(f"Total Number of Camps: {total_camps}")
+        print(f"Total Victims Registered: {total_victims}")
+        if highest_occupancy_camp:
+            print(f"Camp with Highest Occupancy: {highest_occupancy_camp} ({camp_occupancy[highest_occupancy_camp]} victims)")
+        print(f"Total Food Packets Remaining: {sum(camp['food_packets'] for camp in self.camps)}")
+        print(f"Total Medical Kits Remaining: {sum(camp['medical_kits'] for camp in self.camps)}")
+        print(f"Number of Critical Victims: {critical_victims}")
+    
+    def view_camps(self):
+        if not self.camps:
+            print("\nNo camps registered.")
+            return
+        print("\n--- All Camps ---")
+        for camp in self.camps:
+            print(f"Camp ID: {camp['camp_id']}, Location: {camp['location']}, "
+                  f"Capacity: {len(camp['victims'])}/{camp['max_capacity']}, "
+                  f"Food: {camp['food_packets']}, Medical Kits: {camp['medical_kits']}, "
+                  f"Volunteers: {camp['volunteers']}")
+    
+    def view_victims(self):
+        if not self.victims:
+            print("\nNo victims registered.")
+            return
+        print("\n--- All Victims ---")
+        for victim in self.victims:
+            print(f"Victim ID: {victim['victim_id']}, Name: {victim['name']}, "
+                  f"Age: {victim['age']}, Health: {victim['health_condition']}, "
+                  f"Assigned Camp: {victim['assigned_camp']}")
+    
+    def search_victim(self, victim_id):
+        for victim in self.victims:
+            if victim['victim_id'] == victim_id:
+                print("\n--- Victim Found ---")
+                print(f"Victim ID: {victim['victim_id']}, Name: {victim['name']}, "
+                      f"Age: {victim['age']}, Health: {victim['health_condition']}, "
+                      f"Assigned Camp: {victim['assigned_camp']}")
+                return victim
+        print("Victim not found.")
+        return None
+
+# Main Program
+def main():
+    system = DisasterReliefSystem()
+    
+    while True:
+        print("\n=== Smart Disaster Relief Resource Management System ===")
+        print("1. Add New Camp")
+        print("2. Register Victim")
+        print("3. Distribute Resources")
+        print("4. View All Camps")
+        print("5. View All Victims")
+        print("6. Search Victim by ID")
+        print("7. Generate Report")
+        print("8. Exit")
+        
+        choice = input("\nEnter your choice (1-8): ")
+        
+        if choice == '1':
+            try:
+                camp_id = int(input("Enter camp ID: "))
+                location = input("Enter camp location: ")
+                max_capacity = int(input("Enter maximum capacity: "))
+                food_packets = int(input("Enter number of food packets: "))
+                medical_kits = int(input("Enter number of medical kits: "))
+                volunteers = int(input("Enter number of volunteers: "))
+                
+                camp = Camp(camp_id, location, max_capacity, food_packets, medical_kits, volunteers)
+                system.add_camp(camp)
+                print("Camp added successfully!")
+            except ValueError:
+                print("Invalid input. Please enter numeric values where required.")
+        
+        elif choice == '2':
+            try:
+                victim_id = int(input("Enter victim ID: "))
+                name = input("Enter victim name: ")
+                age = int(input("Enter victim age: "))
+                health_condition = input("Enter health condition (normal/critical): ").lower()
+                
+                if health_condition not in ['normal', 'critical']:
+                    print("Invalid health condition. Please enter 'normal' or 'critical'.")
+                    continue
+                
+                camp_id = int(input("Enter camp ID to assign: "))
+                
+                victim = Victim(victim_id, name, age, health_condition, camp_id)
+                system.register_victim(victim, camp_id)
+            except ValueError:
+                print("Invalid input. Please enter numeric values where required.")
+        
+        elif choice == '3':
+            try:
+                victim_id = int(input("Enter victim ID for resource distribution: "))
+                system.distribute_resources(victim_id)
+            except ValueError:
+                print("Invalid input. Please enter a numeric victim ID.")
+        
+        elif choice == '4':
+            system.view_camps()
+        
+        elif choice == '5':
+            system.view_victims()
+        
+        elif choice == '6':
+            try:
+                victim_id = int(input("Enter victim ID to search: "))
+                system.search_victim(victim_id)
+            except ValueError:
+                print("Invalid input. Please enter a numeric victim ID.")
+        
+        elif choice == '7':
+            system.generate_report()
+        
+        elif choice == '8':
+            print("Thank you for using the Disaster Relief Management System. Goodbye!")
+            break
+        
+        else:
+            print("Invalid choice. Please enter a number between 1 and 8.")
+
+if __name__ == "__main__":
+    main()'''
